@@ -1,18 +1,18 @@
 {
   "dev": {
     "driver": "pg",
-    "host": "172.17.0.1",
-    "port": "5432",
+    "host": "localhost",
+    "port": "2024",
     "database": "todos",
-    "user": "app-user",
-    "password": "demoapp@123"
+    "user": "postgres",
+    "password": "password02"
   },
   "test": {
     "driver": "pg",
-    "host": "172.17.0.1",
-    "port": "5432",
+    "host": "localhost",
+    "port": "2024",
     "database": "todos_test",
-    "user": "app-user",
-    "password": "demoapp@123"
+    "user": "postgres",
+    "password": "password02"
   }
 }

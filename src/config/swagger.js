@@ -10,7 +10,7 @@ const options = {
     },
     servers: [
       {
-        url: process.env.API_URL || "http://ec2-3-110-79-61.ap-south-1.compute.amazonaws.com:5001",
+        url: process.env.API_URL || "http://localhost:5000",
         description: "Development server",
       },
     ],

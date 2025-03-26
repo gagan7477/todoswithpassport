@@ -9,24 +9,8 @@ const securityMiddleware = require("./middleware/security");
 const logger = require("./services/logger");
 const pool = require("./config/database");
 const path = require("path");
-const cors = require("cors");
 
 const app = express();
-
-// CORS configuration
-app.use(cors({
-  origin: true, // Allow all origins
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-  // Prevent automatic HTTPS upgrade
-  secure: false
-}));
-
-app.use((req, res, next) => {
-  res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
-  next();
-});
 
 // Database connection check
 const checkDatabaseConnection = async () => {

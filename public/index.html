@@ -654,33 +654,9 @@
     <!-- Inline script using Fetch API -->
     <script>
       // API URLs
-      const API_URL = window.location.protocol === 'https:' 
-        ? window.location.origin.replace('https:', 'http:') 
-        : window.location.origin;
+      const API_URL = window.location.origin;
       const AUTH_API = API_URL + "/api/auth";
       const TODOS_API = API_URL + "/api/todos";
-
-      // Custom fetch function that enforces HTTP
-      async function httpFetch(url, options = {}) {
-        // Ensure headers exist
-        if (!options.headers) {
-          options.headers = {};
-        }
-        
-        // Add header to prevent HTTPS redirects
-        options.headers['X-Forwarded-Proto'] = 'http';
-        options.headers['Upgrade-Insecure-Requests'] = '0';
-        
-        // Ensure URL uses HTTP protocol
-        if (url.startsWith('https:')) {
-          url = url.replace('https:', 'http:');
-        } else if (url.startsWith('/')) {
-          // For relative URLs, prepend with API_URL to ensure HTTP
-          url = API_URL + url;
-        }
-        
-        return fetch(url, options);
-      }
 
       // DOM Elements
       const authContainer = document.getElementById("auth-container");
@@ -831,7 +807,7 @@
       async function login(username, password) {
         try {
           toggleButtonLoading("login-button", true);
-          const response = await httpFetch(`${AUTH_API}/login`, {
+          const response = await fetch(`${AUTH_API}/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, password }),
@@ -858,7 +834,7 @@
       async function register(username, email, password) {
         try {
           toggleButtonLoading("register-button", true);
-          const response = await httpFetch(`${AUTH_API}/register`, {
+          const response = await fetch(`${AUTH_API}/register`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, email, password }),
@@ -885,7 +861,7 @@
       async function fetchTodos() {
         try {
           const token = getAuthToken();
-          const response = await httpFetch(TODOS_API, {
+          const response = await fetch(TODOS_API, {
             headers: { Authorization: token },
           });
           if (!response.ok) {
@@ -907,7 +883,7 @@
         try {
           toggleButtonLoading("add-todo-button", true);
           const token = getAuthToken();
-          const response = await httpFetch(TODOS_API, {
+          const response = await fetch(TODOS_API, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -937,7 +913,7 @@
       async function updateTodo(id, name, description) {
         try {
           const token = getAuthToken();
-          const response = await httpFetch(`${TODOS_API}/${id}`, {
+          const response = await fetch(`${TODOS_API}/${id}`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -968,7 +944,7 @@
       async function deleteTodo(id) {
         try {
           const token = getAuthToken();
-          const response = await httpFetch(`${TODOS_API}/${id}`, {
+          const response = await fetch(`${TODOS_API}/${id}`, {
             method: "DELETE",
             headers: { Authorization: token },
           });
@@ -1119,35 +1095,12 @@
           params.delete("token");
           params.delete("user");
           const newUrl =
-            window.location.protocol + "//" + 
-            window.location.host.replace(/^https?:\/\//i, '') + 
             window.location.pathname +
             (params.toString() ? "?" + params.toString() : "");
           window.history.replaceState({}, document.title, newUrl);
-          
-          // Force HTTP for the current page if needed
-          if (window.location.protocol === 'https:') {
-            window.location.href = window.location.href.replace('https:', 'http:');
-            return;
-          }
-          
           showTodoPage();
         } else {
-          // Force HTTP for the current page if needed
-          if (window.location.protocol === 'https:') {
-            window.location.href = window.location.href.replace('https:', 'http:');
-            return;
-          }
-          
           checkAuth();
-        }
-      });
-
-      // Initialize the Google login button to use HTTP
-      document.addEventListener('DOMContentLoaded', () => {
-        const googleLoginBtn = document.getElementById('google-login');
-        if (googleLoginBtn) {
-          googleLoginBtn.href = `${API_URL}/api/auth/google`;
         }
       });
     </script>
