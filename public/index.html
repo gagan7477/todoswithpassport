@@ -1,0 +1,1155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo App</title>
+    <style>
+      :root {
+        --primary-color: #3498db;
+        --secondary-color: #2ecc71;
+        --danger-color: #e74c3c;
+        --warning-color: #f39c12;
+        --dark-color: #34495e;
+        --light-color: #ecf0f1;
+        --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        background-color: #f5f7fa;
+        color: #333;
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: 2rem auto;
+        padding: 1rem;
+      }
+
+      /* Header */
+      header {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 1rem 0;
+        box-shadow: var(--shadow);
+      }
+
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 2rem;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+      }
+
+      .logo i {
+        margin-right: 0.5rem;
+      }
+
+      .nav-links {
+        display: flex;
+        list-style: none;
+      }
+
+      .nav-links li {
+        margin-left: 1.5rem;
+        cursor: pointer;
+      }
+
+      .nav-links li:hover {
+        text-decoration: underline;
+      }
+
+      /* Auth Pages */
+      .auth-container {
+        max-width: 500px;
+        margin: 3rem auto;
+        padding: 2rem;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+      }
+
+      .auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .auth-header h2 {
+        color: var(--dark-color);
+        margin-bottom: 0.5rem;
+      }
+
+      .auth-tabs {
+        display: flex;
+        margin-bottom: 2rem;
+        border-bottom: 2px solid #eee;
+      }
+
+      .auth-tab {
+        flex: 1;
+        text-align: center;
+        padding: 1rem;
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      .auth-tab.active {
+        color: var(--primary-color);
+        border-bottom: 2px solid var(--primary-color);
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: var(--dark-color);
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 0.8rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+        transition: var(--transition);
+      }
+
+      .form-control:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 0.8rem 1.5rem;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: var(--transition);
+        text-align: center;
+      }
+
+      .btn:hover {
+        background-color: #2980b9;
+        transform: translateY(-2px);
+      }
+
+      .btn-block {
+        display: block;
+        width: 100%;
+      }
+
+      .btn-google {
+        background-color: #db4437;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .btn-google:hover {
+        background-color: #c53929;
+      }
+
+      .btn-google i {
+        margin-right: 0.5rem;
+      }
+
+      .auth-divider {
+        display: flex;
+        align-items: center;
+        margin: 1.5rem 0;
+        color: #777;
+      }
+
+      .auth-divider::before,
+      .auth-divider::after {
+        content: "";
+        flex: 1;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .auth-divider span {
+        padding: 0 10px;
+      }
+
+      /* Todo Page */
+      .todo-container {
+        display: none;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      .todo-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+      }
+
+      .todo-form {
+        background-color: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        margin-bottom: 2rem;
+      }
+
+      /* Ensure todo cards always fill the container width */
+      .todo-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .todo-item {
+        background-color: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        transition: var(--transition);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .todo-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .todo-content h3 {
+        color: var(--dark-color);
+        margin-bottom: 0.5rem;
+      }
+
+      .todo-content p {
+        color: #666;
+      }
+
+      .todo-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .btn-sm {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+      }
+
+      .btn-edit {
+        background-color: var(--warning-color);
+      }
+
+      .btn-edit:hover {
+        background-color: #e67e22;
+      }
+
+      .btn-delete {
+        background-color: var(--danger-color);
+      }
+
+      .btn-delete:hover {
+        background-color: #c0392b;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #777;
+      }
+
+      .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #ddd;
+      }
+
+      /* Modal */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-content {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        width: 100%;
+        max-width: 500px;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #eee;
+      }
+
+      .modal-header h3 {
+        margin: 0;
+        color: var(--dark-color);
+      }
+
+      .close {
+        font-size: 1.5rem;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid #eee;
+      }
+
+      /* Toast notifications */
+      .toast-container {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        z-index: 9999;
+      }
+
+      .toast {
+        background-color: white;
+        color: #333;
+        padding: 1rem 1.5rem;
+        border-radius: 4px;
+        box-shadow: var(--shadow);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        animation: slideIn 0.3s ease-out forwards;
+      }
+
+      .toast.success {
+        border-left: 4px solid var(--secondary-color);
+      }
+
+      .toast.error {
+        border-left: 4px solid var(--danger-color);
+      }
+
+      .toast i {
+        margin-right: 0.8rem;
+        font-size: 1.2rem;
+      }
+
+      .toast.success i {
+        color: var(--secondary-color);
+      }
+
+      .toast.error i {
+        color: var(--danger-color);
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideOut {
+        from {
+          transform: translateX(0);
+          opacity: 1;
+        }
+
+        to {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+      }
+
+      /* Loading spinner */
+      .spinner {
+        display: inline-block;
+        width: 1.5rem;
+        height: 1.5rem;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* User profile */
+      .user-profile {
+        display: flex;
+        align-items: center;
+      }
+
+      .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 0.8rem;
+        background-color: #ddd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: var(--dark-color);
+      }
+
+      /* Utility class for hiding elements */
+      .d-none {
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <nav>
+        <div class="logo"><span>✓</span> TodoApp</div>
+        <ul class="nav-links">
+          <li id="nav-login" class="active">Login</li>
+          <li id="nav-todos" style="display: none">My Todos</li>
+          <li id="nav-logout" style="display: none">Logout</li>
+        </ul>
+      </nav>
+    </header>
+
+    <div class="container">
+      <!-- Auth Container -->
+      <div id="auth-container" class="auth-container">
+        <div class="auth-header">
+          <h2 id="authModalTitle">Welcome to TodoApp</h2>
+          <p>Please login or create an account to continue</p>
+        </div>
+
+        <div class="auth-tabs">
+          <div class="auth-tab active" data-tab="login" id="tab-login">
+            Login
+          </div>
+          <div class="auth-tab" data-tab="register" id="tab-register">
+            Register
+          </div>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form">
+          <div class="form-group">
+            <label for="login-username">Username</label>
+            <input
+              type="text"
+              id="login-username"
+              class="form-control"
+              placeholder="Enter your username"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <input
+              type="password"
+              id="login-password"
+              class="form-control"
+              placeholder="Enter your password"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-block" id="login-button">
+            <span>Login</span>
+            <div class="spinner d-none" style="display: none"></div>
+          </button>
+
+          <div class="auth-divider">
+            <span>OR</span>
+          </div>
+
+          <a
+            href="/api/auth/google"
+            class="btn btn-block btn-google"
+            id="google-login"
+          >
+            <span>Login with Google</span>
+          </a>
+          <p style="text-align: center; margin-top: 1rem">
+            Don't have an account?
+            <a href="#" id="toRegisterForm">Register here</a>
+          </p>
+        </form>
+
+        <!-- Register Form -->
+        <form id="register-form" class="d-none">
+          <div class="form-group">
+            <label for="register-username">Username</label>
+            <input
+              type="text"
+              id="register-username"
+              class="form-control"
+              placeholder="Choose a username"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="register-email">Email</label>
+            <input
+              type="email"
+              id="register-email"
+              class="form-control"
+              placeholder="Enter your email"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="register-password">Password</label>
+            <input
+              type="password"
+              id="register-password"
+              class="form-control"
+              placeholder="Choose a password"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-block" id="register-button">
+            <span>Create Account</span>
+            <div class="spinner d-none" style="display: none"></div>
+          </button>
+          <p style="text-align: center; margin-top: 1rem">
+            Already have an account?
+            <a href="#" id="toLoginForm">Login here</a>
+          </p>
+        </form>
+      </div>
+
+      <!-- Todo Container -->
+      <div id="todo-container" class="todo-container">
+        <div class="todo-header">
+          <h2>My Todo List</h2>
+          <div class="user-profile">
+            <div class="user-avatar" id="user-avatar"></div>
+            <span id="username-display"></span>
+          </div>
+        </div>
+
+        <div class="todo-form">
+          <form id="add-todo-form">
+            <div class="form-group">
+              <label for="todo-name">Todo Name</label>
+              <input
+                type="text"
+                id="todo-name"
+                class="form-control"
+                placeholder="What do you need to do?"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="todo-description">Description (Optional)</label>
+              <textarea
+                id="todo-description"
+                class="form-control"
+                placeholder="Add details about your todo"
+              ></textarea>
+            </div>
+            <button type="submit" class="btn btn-block" id="add-todo-button">
+              <span>Add Todo</span>
+              <div class="spinner d-none" style="display: none"></div>
+            </button>
+          </form>
+        </div>
+
+        <div id="todos-list" class="todo-grid">
+          <!-- Todos will be loaded here -->
+          <div class="empty-state">
+            <div>✓</div>
+            <h3>No todos yet</h3>
+            <p>Add a new todo to get started</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Todo Modal -->
+    <div id="edit-todo-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Edit Todo</h3>
+          <span class="close" id="close-edit-modal">&times;</span>
+        </div>
+        <form id="edit-todo-form">
+          <input type="hidden" id="edit-todo-id" />
+          <div class="form-group">
+            <label for="edit-todo-name">Todo Name</label>
+            <input
+              type="text"
+              id="edit-todo-name"
+              class="form-control"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="edit-todo-description">Description</label>
+            <textarea
+              id="edit-todo-description"
+              class="form-control"
+            ></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-delete" id="edit-modal-cancel">
+              Cancel
+            </button>
+            <button type="submit" class="btn">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Inline script using Fetch API -->
+    <script>
+      // API URLs
+      const API_URL = window.location.protocol === 'https:' 
+        ? window.location.origin.replace('https:', 'http:') 
+        : window.location.origin;
+      const AUTH_API = API_URL + "/api/auth";
+      const TODOS_API = API_URL + "/api/todos";
+
+      // Custom fetch function that enforces HTTP
+      async function httpFetch(url, options = {}) {
+        // Ensure headers exist
+        if (!options.headers) {
+          options.headers = {};
+        }
+        
+        // Add header to prevent HTTPS redirects
+        options.headers['X-Forwarded-Proto'] = 'http';
+        options.headers['Upgrade-Insecure-Requests'] = '0';
+        
+        // Ensure URL uses HTTP protocol
+        if (url.startsWith('https:')) {
+          url = url.replace('https:', 'http:');
+        } else if (url.startsWith('/')) {
+          // For relative URLs, prepend with API_URL to ensure HTTP
+          url = API_URL + url;
+        }
+        
+        return fetch(url, options);
+      }
+
+      // DOM Elements
+      const authContainer = document.getElementById("auth-container");
+      const todoContainer = document.getElementById("todo-container");
+      const loginForm = document.getElementById("login-form");
+      const registerForm = document.getElementById("register-form");
+      const addTodoForm = document.getElementById("add-todo-form");
+      const editTodoForm = document.getElementById("edit-todo-form");
+      const todosList = document.getElementById("todos-list");
+      const editTodoModal = document.getElementById("edit-todo-modal");
+      const closeModalBtn = document.getElementById("close-edit-modal");
+      const cancelEditBtn = document.getElementById("edit-modal-cancel");
+      const navLogin = document.getElementById("nav-login");
+      const navTodos = document.getElementById("nav-todos");
+      const navLogout = document.getElementById("nav-logout");
+      const userAvatar = document.getElementById("user-avatar");
+      const usernameDisplay = document.getElementById("username-display");
+
+      // Auth Tabs and Toggle Links
+      const tabLogin = document.getElementById("tab-login");
+      const tabRegister = document.getElementById("tab-register");
+      const toRegisterLink = document.getElementById("toRegisterForm");
+      const toLoginLink = document.getElementById("toLoginForm");
+
+      // State Management
+      let currentUser = null;
+      let todos = [];
+
+      // Helper Functions
+      function setAuthToken(token) {
+        // Store token as "Bearer <token>"
+        localStorage.setItem("token", `Bearer ${token}`);
+      }
+
+      function getAuthToken() {
+        return localStorage.getItem("token");
+      }
+
+      function setCurrentUser(user) {
+        currentUser = user;
+        localStorage.setItem("user", JSON.stringify(user));
+      }
+
+      function getCurrentUser() {
+        return JSON.parse(localStorage.getItem("user"));
+      }
+
+      function showToast(message, type = "success") {
+        const toast = document.createElement("div");
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `<i>${type === "success" ? "✓" : "✕"}</i><span>${message}</span>`;
+        document.getElementById("toast-container").appendChild(toast);
+        setTimeout(() => {
+          toast.style.animation = "slideOut 0.3s forwards";
+          setTimeout(() => {
+            toast.remove();
+          }, 300);
+        }, 3000);
+      }
+
+      function toggleButtonLoading(buttonId, isLoading) {
+        const button = document.getElementById(buttonId);
+        const buttonText = button.querySelector("span");
+        const spinner = button.querySelector(".spinner");
+        if (isLoading) {
+          buttonText.style.display = "none";
+          spinner.style.display = "inline-block";
+          button.disabled = true;
+        } else {
+          buttonText.style.display = "inline";
+          spinner.style.display = "none";
+          button.disabled = false;
+        }
+      }
+
+      function escapeHTML(str) {
+        if (!str) return "";
+        return str
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      // UI Navigation Functions
+      function showAuthPage() {
+        authContainer.style.display = "block";
+        todoContainer.style.display = "none";
+        navLogin.style.display = "block";
+        navTodos.style.display = "none";
+        navLogout.style.display = "none";
+      }
+
+      function showTodoPage() {
+        authContainer.style.display = "none";
+        todoContainer.style.display = "block";
+        navLogin.style.display = "none";
+        navTodos.style.display = "block";
+        navLogout.style.display = "block";
+        // Update user info if available
+        if (currentUser) {
+          usernameDisplay.textContent = currentUser.username;
+          userAvatar.textContent = currentUser.username.charAt(0).toUpperCase();
+        }
+        fetchTodos();
+      }
+
+      function checkAuth() {
+        const token = getAuthToken();
+        const user = localStorage.getItem("user");
+        if (token && user) {
+          currentUser = JSON.parse(user);
+          showTodoPage();
+        } else {
+          showAuthPage();
+        }
+      }
+
+      // Toggle between Login and Register Tabs
+      function activateTab(tab) {
+        if (tab === "login") {
+          tabLogin.classList.add("active");
+          tabRegister.classList.remove("active");
+          loginForm.classList.remove("d-none");
+          registerForm.classList.add("d-none");
+        } else {
+          tabLogin.classList.remove("active");
+          tabRegister.classList.add("active");
+          loginForm.classList.add("d-none");
+          registerForm.classList.remove("d-none");
+        }
+      }
+
+      tabLogin.addEventListener("click", () => activateTab("login"));
+      tabRegister.addEventListener("click", () => activateTab("register"));
+      toRegisterLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        activateTab("register");
+      });
+      toLoginLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        activateTab("login");
+      });
+
+      // API Functions using Fetch
+
+      async function login(username, password) {
+        try {
+          toggleButtonLoading("login-button", true);
+          const response = await httpFetch(`${AUTH_API}/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password }),
+          });
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(
+              errorData.error || errorData.message || "Login failed",
+            );
+          }
+          const { token, user } = await response.json();
+          setAuthToken(token);
+          setCurrentUser(user);
+          showToast("Login successful", "success");
+          showTodoPage();
+        } catch (error) {
+          console.error("Login error:", error);
+          showToast(error.message || "Login failed", "error");
+        } finally {
+          toggleButtonLoading("login-button", false);
+        }
+      }
+
+      async function register(username, email, password) {
+        try {
+          toggleButtonLoading("register-button", true);
+          const response = await httpFetch(`${AUTH_API}/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, email, password }),
+          });
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(
+              errorData.error || errorData.message || "Registration failed",
+            );
+          }
+          const { token, user } = await response.json();
+          setAuthToken(token);
+          setCurrentUser(user);
+          showToast("Registration successful", "success");
+          showTodoPage();
+        } catch (error) {
+          console.error("Registration error:", error);
+          showToast(error.message || "Registration failed", "error");
+        } finally {
+          toggleButtonLoading("register-button", false);
+        }
+      }
+
+      async function fetchTodos() {
+        try {
+          const token = getAuthToken();
+          const response = await httpFetch(TODOS_API, {
+            headers: { Authorization: token },
+          });
+          if (!response.ok) {
+            if (response.status === 401) logout();
+            const errorData = await response.json();
+            throw new Error(
+              errorData.error || errorData.message || "Failed to load todos",
+            );
+          }
+          todos = await response.json();
+          renderTodos();
+        } catch (error) {
+          console.error("Fetch todos error:", error);
+          showToast(error.message || "Failed to load todos", "error");
+        }
+      }
+
+      async function addTodo(name, description) {
+        try {
+          toggleButtonLoading("add-todo-button", true);
+          const token = getAuthToken();
+          const response = await httpFetch(TODOS_API, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token,
+            },
+            body: JSON.stringify({ name, description }),
+          });
+          if (!response.ok) {
+            if (response.status === 401) logout();
+            const errorData = await response.json();
+            throw new Error(
+              errorData.error || errorData.message || "Failed to add todo",
+            );
+          }
+          const newTodo = await response.json();
+          todos.push(newTodo);
+          renderTodos();
+          showToast("Todo added successfully", "success");
+        } catch (error) {
+          console.error("Add todo error:", error);
+          showToast(error.message || "Failed to add todo", "error");
+        } finally {
+          toggleButtonLoading("add-todo-button", false);
+        }
+      }
+
+      async function updateTodo(id, name, description) {
+        try {
+          const token = getAuthToken();
+          const response = await httpFetch(`${TODOS_API}/${id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token,
+            },
+            body: JSON.stringify({ name, description }),
+          });
+          if (!response.ok) {
+            if (response.status === 401) logout();
+            const errorData = await response.json();
+            throw new Error(
+              errorData.error || errorData.message || "Failed to update todo",
+            );
+          }
+          const updatedTodo = await response.json();
+          todos = todos.map((todo) =>
+            todo.id === updatedTodo.id ? updatedTodo : todo,
+          );
+          renderTodos();
+          closeModal();
+          showToast("Todo updated successfully", "success");
+        } catch (error) {
+          console.error("Update todo error:", error);
+          showToast(error.message || "Failed to update todo", "error");
+        }
+      }
+
+      async function deleteTodo(id) {
+        try {
+          const token = getAuthToken();
+          const response = await httpFetch(`${TODOS_API}/${id}`, {
+            method: "DELETE",
+            headers: { Authorization: token },
+          });
+          if (!response.ok) {
+            if (response.status === 401) logout();
+            const errorData = await response.json();
+            throw new Error(
+              errorData.error || errorData.message || "Failed to delete todo",
+            );
+          }
+          // Re-fetch todos from the API to update the list
+          await fetchTodos();
+          showToast("Todo deleted successfully", "success");
+        } catch (error) {
+          console.error("Delete todo error:", error);
+          showToast(error.message || "Failed to delete todo", "error");
+        }
+      }
+
+      function logout() {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        currentUser = null;
+        todos = [];
+        showAuthPage();
+        showToast("Logged out successfully", "success");
+      }
+
+      function renderTodos() {
+        if (todos.length === 0) {
+          todosList.innerHTML = `
+          <div class="empty-state">
+            <div>✓</div>
+            <h3>No todos yet</h3>
+            <p>Add a new todo to get started</p>
+          </div>
+        `;
+          return;
+        }
+        todosList.innerHTML = "";
+        todos.forEach((todo) => {
+          const todoEl = document.createElement("div");
+          todoEl.className = "todo-item";
+          todoEl.innerHTML = `
+          <div class="todo-content">
+            <h3>${escapeHTML(todo.name)}</h3>
+            <p>${escapeHTML(todo.description || "No description")}</p>
+          </div>
+          <div class="todo-actions">
+            <button class="btn btn-sm btn-edit" data-id="${todo.id}">Edit</button>
+            <button class="btn btn-sm btn-delete" data-id="${todo.id}">Delete</button>
+          </div>
+        `;
+          todosList.appendChild(todoEl);
+        });
+        // Add event listeners for edit and delete buttons
+        document.querySelectorAll(".btn-edit").forEach((btn) => {
+          btn.addEventListener("click", () => openEditModal(btn.dataset.id));
+        });
+        document.querySelectorAll(".btn-delete").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            if (confirm("Are you sure you want to delete this todo?")) {
+              deleteTodo(btn.dataset.id);
+            }
+          });
+        });
+      }
+
+      function openEditModal(todoId) {
+        const todo = todos.find((t) => t.id == todoId);
+        if (!todo) return;
+        document.getElementById("edit-todo-id").value = todo.id;
+        document.getElementById("edit-todo-name").value = todo.name;
+        document.getElementById("edit-todo-description").value =
+          todo.description || "";
+        editTodoModal.style.display = "flex";
+      }
+
+      function closeModal() {
+        editTodoModal.style.display = "none";
+      }
+
+      // Event Listeners
+      loginForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const username = document.getElementById("login-username").value;
+        const password = document.getElementById("login-password").value;
+        login(username, password);
+      });
+
+      registerForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const username = document.getElementById("register-username").value;
+        const email = document.getElementById("register-email").value;
+        const password = document.getElementById("register-password").value;
+        register(username, email, password);
+      });
+
+      addTodoForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = document.getElementById("todo-name").value;
+        const description = document.getElementById("todo-description").value;
+        addTodo(name, description);
+        addTodoForm.reset();
+      });
+
+      editTodoForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const id = document.getElementById("edit-todo-id").value;
+        const name = document.getElementById("edit-todo-name").value;
+        const description = document.getElementById(
+          "edit-todo-description",
+        ).value;
+        updateTodo(id, name, description);
+      });
+
+      navLogin.addEventListener("click", showAuthPage);
+      navTodos.addEventListener("click", showTodoPage);
+      navLogout.addEventListener("click", logout);
+      closeModalBtn.addEventListener("click", closeModal);
+      cancelEditBtn.addEventListener("click", closeModal);
+
+      // Close modal when clicking outside of it
+      window.addEventListener("click", (e) => {
+        if (e.target === editTodoModal) {
+          closeModal();
+        }
+      });
+
+      // On page load, check for Google OAuth token in query parameters.
+      window.addEventListener("load", () => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has("token")) {
+          const token = params.get("token");
+          setAuthToken(token);
+          // Optionally, if user info is provided as a query param
+          if (params.has("user")) {
+            try {
+              const userObj = JSON.parse(
+                decodeURIComponent(params.get("user")),
+              );
+              setCurrentUser(userObj);
+            } catch (err) {
+              console.error("Error parsing user from query param", err);
+            }
+          }
+          // Remove token (and user) from URL
+          params.delete("token");
+          params.delete("user");
+          const newUrl =
+            window.location.protocol + "//" + 
+            window.location.host.replace(/^https?:\/\//i, '') + 
+            window.location.pathname +
+            (params.toString() ? "?" + params.toString() : "");
+          window.history.replaceState({}, document.title, newUrl);
+          
+          // Force HTTP for the current page if needed
+          if (window.location.protocol === 'https:') {
+            window.location.href = window.location.href.replace('https:', 'http:');
+            return;
+          }
+          
+          showTodoPage();
+        } else {
+          // Force HTTP for the current page if needed
+          if (window.location.protocol === 'https:') {
+            window.location.href = window.location.href.replace('https:', 'http:');
+            return;
+          }
+          
+          checkAuth();
+        }
+      });
+
+      // Initialize the Google login button to use HTTP
+      document.addEventListener('DOMContentLoaded', () => {
+        const googleLoginBtn = document.getElementById('google-login');
+        if (googleLoginBtn) {
+          googleLoginBtn.href = `${API_URL}/api/auth/google`;
+        }
+      });
+    </script>
+  </body>
+</html>
